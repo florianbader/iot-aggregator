@@ -20,7 +20,7 @@
         "quoteArgs": true
       },
       "sourceFileMap": {
-        "/app": "${workspaceFolder}/modules/aggregator"
+        "/app": "${workspaceFolder}/src/aggregator"
       },
       "justMyCode": true
     },
@@ -28,9 +28,9 @@
       "name": "aggregator Local Debug (.NET Core)",
       "type": "coreclr",
       "request": "launch",
-      "program": "${workspaceRoot}/modules/aggregator/bin/Debug/netcoreapp2.1/aggregator.dll",
+      "program": "${workspaceRoot}/src/aggregator/bin/Debug/netcoreapp3.1/aggregator.dll",
       "args": [],
-      "cwd": "${workspaceRoot}/modules/aggregator",
+      "cwd": "${workspaceRoot}/src/aggregator",
       "internalConsoleOptions": "openOnSessionStart",
       "stopAtEntry": false,
       "console": "internalConsole",

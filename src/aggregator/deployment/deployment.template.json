@@ -1,0 +1,81 @@
+{
+  "content": {
+    "modulesContent": {
+      "$edgeAgent": {
+        "properties.desired": {
+          "schemaVersion": "1.0",
+          "runtime": {
+            "type": "docker",
+            "settings": {
+              "minDockerVersion": "v1.25",
+              "loggingOptions": "",
+              "registryCredentials": {
+                "acr": {
+                  "address": "__ContainerRegistryUrl__",
+                  "password": "__ContainerRegistryPassword__",
+                  "username": "__ContainerRegistryUsername__"
+                }
+              }
+            }
+          },
+          "systemModules": {
+            "edgeAgent": {
+              "type": "docker",
+              "settings": {
+                "image": "mcr.microsoft.com/azureiotedge-agent:1.0"
+              },
+              "env": {
+                "UpstreamProtocol": { "value": "__UpstreamProtocol__" }
+              }
+            },
+            "edgeHub": {
+              "type": "docker",
+              "status": "running",
+              "restartPolicy": "always",
+              "settings": {
+                "image": "mcr.microsoft.com/azureiotedge-hub:1.0"
+              },
+              "env": {
+                "UpstreamProtocol": { "value": "__UpstreamProtocol__" }
+              }
+            }
+          },
+          "modules": {
+            "aggregator": {
+              "version": "1.0.0",
+              "type": "docker",
+              "status": "running",
+              "restartPolicy": "always",
+              "settings": {
+                "image": "__ContainerRegistryUrl__/__Environment__/:__Version__"
+              },
+              "env": {}
+            }
+          }
+        }
+      },
+      "$edgeHub": {
+        "properties.desired": {
+          "schemaVersion": "1.0",
+          "routes": {
+            "sensorToaggregator": "FROM /messages/modules/* WHERE $connectionModuleId != 'aggregator' INTO BrokeredEndpoint(\"/modules/aggregator/inputs/catchAll\")"
+          },
+          "storeAndForwardConfiguration": {
+            "timeToLiveSecs": 7200
+          }
+        }
+      }
+    }
+  },
+  "systemMetrics": {
+    "queries": {
+      "Targeted": "select deviceId from devices where capabilities.iotEdge = true and tags.environment='__Environment__'",
+      "Applied": "select deviceId from devices.modules where moduleId = '$edgeAgent' and configurations.[[latest]].status = 'Applied'",
+      "Reporting Success": "select deviceId from devices.modules where moduleId = '$edgeAgent' and configurations.[[latest]].status = 'Applied' and properties.desired.$version = properties.reported.lastDesiredVersion and properties.reported.lastDesiredStatus.code = 200",
+      "Reporting Failure": "select deviceId from devices.modules where moduleId = '$edgeAgent' and configurations.[[latest]].status = 'Applied' and properties.desired.$version = properties.reported.lastDesiredVersion and properties.reported.lastDesiredStatus.code != 200"
+    }
+  },
+  "metrics": {
+    "queries": {}
+  }
+}

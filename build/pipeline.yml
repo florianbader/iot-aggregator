@@ -1,0 +1,95 @@
+trigger:
+  branches:
+    include:
+        - master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - name: BuildConfiguration
+    value: Release
+
+  - name: ModuleName
+    value: aggregator
+  - name: UpstreamProtocol
+    value: MQTTWS
+
+  - name: Version.MajorMinor
+    value: 1.0
+  - name: Version.Revision
+    value: $[counter(variables['Version.MajorMinor'], 0)]
+  - name: Version
+    value: $[format('{0}.{1}.{2}', variables['Version.MajorMinor'], variables['Version.Revision'])]
+
+  # AzureSubscriptionServiceName
+  # ContainerRegistryServiceName
+  - group: ModulePipeline
+
+  # ContainerRegistryUsername
+  # ContainerRegistryPassword
+  - group: ContainerRegistry
+
+  - name: ContainerRegistryUrl
+    value: $(ContainerRegistryName).azurecr.io
+
+  - name: ImageBuildUrl
+    value: $(ContainerRegistryUrl)/build/$(ModuleName):$(Version)
+
+name: $(Version)
+
+stages:
+    - stage: Build
+      variables:
+          SourceFolder: src/aggregator
+      jobs:
+          - job: BuildSolution
+            displayName: 'Build solution'
+            steps:
+            - task: UseDotNet@2
+              inputs:
+                useGlobalJson: true
+              displayName: 'Install .NET Core SDK'
+
+            - script: dotnet test --filter Category!=Integration
+              displayName: 'Run unit tests'
+              workingDirectory: $(SourceFolder)/Tests/
+
+            - script: dotnet publish -c $(BuildConfiguration) -o $(Build.ArtifactStagingDirectory)/out
+              displayName: 'Build and publish project'
+              workingDirectory: $(SourceFolder)
+
+            - task: Docker@2
+              inputs:
+                command: login
+                containerRegistry: $(ContainerRegistryServiceName)
+              displayName: 'Docker login'
+
+            - template: ./build-image.template.yml
+              parameters:
+                ImageArchitecture: amd64
+
+            - template: ./build-image.template.yml
+              parameters:
+                ImageArchitecture: arm32v7
+
+            - script: docker manifest create $(ImageBuildUrl) $(ImageBuildUrl)-amd64 $(ImageBuildUrl)-arm32v7
+              env:
+                DOCKER_CLI_EXPERIMENTAL: enabled
+                condition: and(succeeded(), neq(variables['Build.Reason'], 'PullRequest'))
+              displayName: 'Create manifest'
+
+            - script: docker manifest push $(ImageBuildUrl)
+              env:
+                DOCKER_CLI_EXPERIMENTAL: enabled
+                condition: and(succeeded(), neq(variables['Build.Reason'], 'PullRequest'))
+              displayName: 'Push manifest'
+
+            - upload: $(SourceFolder)/deployment/deployment.template.json
+              artifact: DeploymentTemplate
+              condition: and(succeeded(), neq(variables['Build.Reason'], 'PullRequest'))
+              displayName: 'Publish deployment template'
+
+    - template: deployment.template.yml
+      parameters:
+          Environment: Dev

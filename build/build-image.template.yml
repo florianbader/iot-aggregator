@@ -1,0 +1,10 @@
+parameters:
+  ImageArchitecture: ''
+
+steps:
+  - script: docker build -f $(SourceFolder)/Dockerfile.${{ parameters.ImageArchitecture }} -t $(ModuleName):$(Version)-${{ parameters.ImageArchitecture }} $(Build.ArtifactStagingDirectory)
+    displayName: 'Build ${{ parameters.ImageArchitecture }}'
+
+  - script: docker push $(ImageUrl):$(Version)-${{ parameters.ImageArchitecture }}
+    condition: and(succeeded(), neq(variables['Build.Reason'], 'PullRequest'))
+    displayName: 'Push ${{ parameters.ImageArchitecture }}'
