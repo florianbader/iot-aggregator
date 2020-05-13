@@ -7,10 +7,16 @@ IoT Aggregator is an Azure IoT Edge module to aggregate and transform messages b
 ## Getting Started
 
 ### Prerequisites
+
 [.NET Core 3.1+ SDK](https://www.microsoft.com/net/download/core) must be installed.
 
 ### Installing
-Build the solution ``docker build  --rm -f "src/aggregator/Dockerfile.amd64.debug" -t localhost:5000/aggregator:0.0.1-amd64.debug "src/aggregator" ; if ($?) { & "iotedgehubdev" start -d "./src/aggregator/deployment.json" -v }``
+
+Build the solution ``.\src\aggregator\build.ps1``
+
+### Debugging
+
+Debug the solution ``.\src\aggregator\debug.ps1``
 
 ## Contributing
 

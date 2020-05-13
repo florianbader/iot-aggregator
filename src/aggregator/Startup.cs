@@ -6,7 +6,7 @@ using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace aggregator
+namespace Bader
 {
     public class Startup
     {

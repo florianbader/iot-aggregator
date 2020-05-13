@@ -27,9 +27,6 @@ stages:
                     command: login
                     containerRegistry: $(ContainerRegistryServiceName)
 
-                - download: current
-                  artifact: DeploymentTemplate
-
                 - script: |
                     docker pull $(ImageBuildUrl)-arm32v7
                     docker pull $(ImageBuildUrl)-amd64
@@ -57,20 +54,27 @@ stages:
 
                 - task: AzureCLI@2
                   inputs:
-                    azureSubscription:
+                    azureSubscription: $(AzureSubscriptionServiceName)
                     scriptType: bash
                     scriptLocation: inlineScript
                     inlineScript: az extension add -n azure-cli-iot-ext
                   displayName: 'Install Azure CLI IoT extension'
 
+                - download: current
+                  artifact: DeploymentTemplate
+
                 - pwsh: |
                     $filePath = "$(Pipeline.Workspace)/DeploymentTemplate/deployment.template.json"
-                    (gc $filePath).replace('__Environment__', '${{ parameters.Environment }}') | Set-Content $filePath
-                    (gc $filePath).replace('__Version__', '$(Version)') | Set-Content $filePath
-                    (gc $filePath).replace('__ContainerRegistryUrl__', '$(ContainerRegistryUrl)') | Set-Content $filePath
-                    (gc $filePath).replace('__ContainerRegistryUsername__', '$(ContainerRegistryUsername)') | Set-Content $filePath
-                    (gc $filePath).replace('__ContainerRegistryPassword__', '$(ContainerRegistryPassword)') | Set-Content $filePath
-                    (gc $filePath).replace('__UpstreamProtocol__', '$(UpstreamProtocol)') | Set-Content $filePath
+                    $content = gc $filePath
+
+                    $content = $content.replace('__Environment__', '${{ parameters.Environment }}')
+                    $content = $content.replace('__Version__', '$(Version)')
+                    $content = $content.replace('__ContainerRegistryUrl__', '$(ContainerRegistryUrl)')
+                    $content = $content.replace('__ContainerRegistryUsername__', '$(ContainerRegistryUsername)')
+                    $content = $content.replace('__ContainerRegistryPassword__', '$(ContainerRegistryPassword)')
+                    $content = $content.replace('__UpstreamProtocol__', '$(UpstreamProtocol)')
+
+                    sc $filePath $content
                   displayName: 'Replace tokens in deployment template'
 
                 - task: AzureCLI@2
@@ -79,7 +83,7 @@ stages:
                     scriptType: bash
                     scriptLocation: inlineScript
                     inlineScript: |
-                      az iot edge deployment create -n $(IoTHubName) -d $(ModuleName}-$(VersionNumber) --layered --target-condition "tags.environment='${{ parameters.Environment }}'" --priority $(VersionNumber)0 --content $(Pipeline.Workspace)/DeploymentTemplate/deployment.template.json
+                      az iot edge deployment create -n $(IoTHubName) -d $(ModuleName}-$(VersionNumber) --target-condition "tags.environment='${{ parameters.Environment }}'" --priority $(VersionNumber)0 --content $(Pipeline.Workspace)/DeploymentTemplate/deployment.template.json
                   displayName: 'Create IoT Hub edge deployment'
 
                 - task: AzureCLI@2

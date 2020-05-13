@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bader.Edge.EventAggregator", "aggregator\Bader.Edge.EventAggregator.csproj", "{7B0184E9-C59B-4C4C-9C15-32874C5D9B3A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution files", "Solution files", "{2507BAF8-02C3-4073-BA3D-C00EED4BEC7B}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
+		..\..\repo-blueprint\Directory.Build.props = ..\..\repo-blueprint\Directory.Build.props
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B0184E9-C59B-4C4C-9C15-32874C5D9B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B0184E9-C59B-4C4C-9C15-32874C5D9B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B0184E9-C59B-4C4C-9C15-32874C5D9B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B0184E9-C59B-4C4C-9C15-32874C5D9B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A61E91EF-EF3B-44FF-97EC-CC95395EA1CB}
+	EndGlobalSection
+EndGlobal
