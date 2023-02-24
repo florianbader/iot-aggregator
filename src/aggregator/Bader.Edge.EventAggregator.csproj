@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="iot-module-host" Version="0.2.0-preview6" />
-    <PackageReference Include="LiteDB" Version="5.0.0-beta" />
+    <PackageReference Include="LiteDB" Version="5.0.13" />
     <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.*" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
     <PackageReference Include="Serilog" Version="2.8.0" />
